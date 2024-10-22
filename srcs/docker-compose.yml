@@ -1,21 +1,21 @@
 services:
-  nginx:
-    container_name: nginx
-    build: ./requirements/nginx/.
-    restart: unless-stopped
-    ports:
-      - 80:80
-    volumes:
-      - ./requirements/nginx/conf/html/:/var/www/html/
-      # - ./requirements/nginx/conf/html/:/var/www/html/
-      # - shared:/etc/nginx/html
-    networks:
-      - inception
-    env_file:
-      - .env
-    # depends_on:
-      # - mariadb
-      # - wordpress
+  # nginx:
+    # container_name: nginx
+    # build: ./requirements/nginx/.
+    # restart: unless-stopped
+    # ports:
+    #   - 80:80
+    # volumes:
+    #   - ./requirements/nginx/conf/html/:/var/www/html/
+    #   # - ./requirements/nginx/conf/html/:/var/www/html/
+    #   # - shared:/etc/nginx/html
+    # networks:
+    #   - inception
+    # env_file:
+    #   - .env
+    # # depends_on:
+    #   # - mariadb
+    #   # - wordpress
 
   # wordpress:
   #   container_name: WordPress+PHP
@@ -32,42 +32,44 @@ services:
   #   depends_on:
   #     - mariadb
 
-  # mariadb:
-  #   container_name: mariadb
-  #   build:
-  #     labels:
-  #       - inception-mariadb:latest
-  #     context: ./requirements/mariadb/.
-  #   restart: unless-stopped
-  #   ports:
-  #     - 3306:3306
-  #   volumes:
-  #     - database:/var/lib/mysql
-  #   networks:
-  #     - inception
-  #   env_file:
-  #     - .env
-
-# bonus services
-  redis:
-    container_name: redis
-    profiles: [bonus] # docker-compose --profile bonus up
-    build: ./requirements/bonus/redis/.
-    restart: unless-stopped
+  mariadb:
+    container_name: mariadb
+    build:
+      labels:
+        - inception-mariadb:latest
+      context: ./requirements/mariadb/.
+    restart: no # change to unless-stopped
     ports:
-      - 6379:6379
+      - 3306:3306
     volumes:
-      - shared:/etc/nginx/html
+      - database:/var/lib/mysql
+      - /Users/dibba/42/42cursus/42_inception/srcs/requirements/mariadb/tools/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - inception
     env_file:
       - .env
 
-# volumes:
+# bonus services
+  # redis:
+  #   container_name: redis
+  #   profiles: [bonus] # docker-compose --profile bonus up
+  #   build: ./requirements/bonus/redis/.
+  #   restart: unless-stopped
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - shared:/etc/nginx/html
+  #   networks:
+  #     - inception
+  #   env_file:
+  #     - .env
+
+volumes:
 #   shared:
 #     name: WordPress
-#   database:
-#     name: DB
+  database:
+    name: DB
+    driver: local
 
 networks:
   inception:

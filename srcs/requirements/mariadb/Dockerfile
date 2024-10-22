@@ -1,19 +1,19 @@
-FROM alpine:3.18
+FROM debian:11-slim
 
-RUN apk add --no-cache mariadb mariadb-client mariadb-server-utils && rm -f /var/cache/apk/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends mariadb-client mariadb-server
 
-ADD conf/entrypoint.sh /scripts/entrypoint.sh
+RUN rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /scripts/docker-entrypoint-initdb.d && mkdir /scripts/pre-exec.d && mkdir /scripts/pre-init.d && chmod -R 755 /scripts
+RUN mkdir -p /docker-entrypoint-initdb.d && \
+    mkdir -p /scripts/pre-exec.d && \
+    mkdir -p /scripts/pre-init.d && \
+    chmod -R 755 /scripts
 
-COPY ./conf/docker-entrypoint-initdb.d /scripts/docker-entrypoint-initdb.d
-
-COPY ./conf/pre-exec.d /scripts/pre-exec.d
-
-COPY ./conf/pre-init.d /scripts/pre-init.d
+COPY /conf/run.sh /scripts/run.sh
 
 EXPOSE 3306
 
 VOLUME ["/var/lib/mysql"]
 
-ENTRYPOINT ["/scripts/entrypoint.sh"]
+ENTRYPOINT ["/scripts/run.sh"]
