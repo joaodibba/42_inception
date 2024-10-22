@@ -1,0 +1,74 @@
+services:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx/.
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./requirements/nginx/conf/html/:/var/www/html/
+      # - ./requirements/nginx/conf/html/:/var/www/html/
+      # - shared:/etc/nginx/html
+    networks:
+      - inception
+    env_file:
+      - .env
+    # depends_on:
+      # - mariadb
+      # - wordpress
+
+  # wordpress:
+  #   container_name: WordPress+PHP
+  #   build: ./requirements/wordpress/.
+  #   restart: unless-stopped
+  #   ports:
+  #     - 9000:9000
+  #   volumes:
+  #     - shared:/var/www/html
+  #   networks:
+  #     - inception
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - mariadb
+
+  # mariadb:
+  #   container_name: mariadb
+  #   build:
+  #     labels:
+  #       - inception-mariadb:latest
+  #     context: ./requirements/mariadb/.
+  #   restart: unless-stopped
+  #   ports:
+  #     - 3306:3306
+  #   volumes:
+  #     - database:/var/lib/mysql
+  #   networks:
+  #     - inception
+  #   env_file:
+  #     - .env
+
+# bonus services
+  redis:
+    container_name: redis
+    profiles: [bonus] # docker-compose --profile bonus up
+    build: ./requirements/bonus/redis/.
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - shared:/etc/nginx/html
+    networks:
+      - inception
+    env_file:
+      - .env
+
+# volumes:
+#   shared:
+#     name: WordPress
+#   database:
+#     name: DB
+
+networks:
+  inception:
+    name: inception

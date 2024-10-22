@@ -1,0 +1,2 @@
+-- Scripts in the pre-exec.d directory are run after the init scripts.
+-- This can be useful if you need to initialize the database with some data.
