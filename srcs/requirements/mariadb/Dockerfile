@@ -1,9 +1,13 @@
 FROM debian:11-slim
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends mariadb-client mariadb-server
-
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    mariadb-client \
+    mariadb-server \
+    gosu \
+    util-linux \
+    bash \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /docker-entrypoint-initdb.d && \
     mkdir -p /scripts/pre-exec.d && \
@@ -11,9 +15,8 @@ RUN mkdir -p /docker-entrypoint-initdb.d && \
     chmod -R 755 /scripts
 
 COPY /conf/run.sh /scripts/run.sh
-
-EXPOSE 3306
-
-VOLUME ["/var/lib/mysql"]
+COPY ./tools/docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
+COPY ./tools/pre-exec.d /scripts/pre-exec.d
+COPY ./tools/pre-init.d /scripts/pre-init.d
 
 ENTRYPOINT ["/scripts/run.sh"]

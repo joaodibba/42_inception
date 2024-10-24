@@ -1,13 +1,5 @@
 #!/bin/sh
 
-MYSQL_ROOT_PASSWORD==${MYSQL_ROOT_PASSWORD:-"mysql"}
-MYSQL_DATABASE=${MYSQL_DATABASE:-"mysql"}
-MYSQL_USER=${MYSQL_USER:-"mysql"}
-MYSQL_PASSWORD=${MYSQL_PASSWORD:-"mysql"}
-BIND_ADDRESS=${BIND_ADDRESS:-"0.0.0.0"}
-MYSQL_CHARSET=${MYSQL_CHARSET:-"utf8"}
-MYSQL_COLLATION=${MYSQL_COLLATION:-"utf8_general_ci"}
-
 exec_pre_init_scripts() {
     for i in /scripts/pre-init.d/*sh
     do
@@ -48,37 +40,35 @@ create_initial_mysql_database(){
     cat << EOF > $tfile
 USE mysql;
 
--- Reload grant tables (only once at the end or before changes)
 FLUSH PRIVILEGES;
 
--- Grant privileges to root for remote and localhost access
 GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
 GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
 
--- Update the password for root@localhost using the modern way
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 
--- Drop the test database if it exists
 DROP DATABASE IF EXISTS test;
 
--- Create the specified database with character set and collation
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE} CHARACTER SET ${MYSQL_CHARSET} COLLATE ${MYSQL_COLLATION};
 
--- Create a new user and grant privileges for the specific database
 CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 
--- (Optional) Grant global privileges to the new user (use with caution)
 GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' WITH GRANT OPTION;
 
--- Reload the grant tables (you only need this once)
 FLUSH PRIVILEGES;
 
 EOF
 
-        mysqld --user=mysql --bootstrap --verbose=0 --skip-name-resolve --silent-startup --skip-networking=0 < $tfile 2>&1 &
+        cat $tfile # TODO
+
+        mysqld --user=mysql --bootstrap --verbose=0 --skip-name-resolve --silent-startup --skip-networking=0 < $tfile #2>&1 &
         rm -f $tfile
         fi
+
+        echo
+        echo 'Initial MySQL database and user creation complete'
+        echo
 }
 
 process_docker_entrypoint_initdb_scripts() {

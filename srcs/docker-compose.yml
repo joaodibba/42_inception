@@ -1,36 +1,47 @@
 services:
-  # nginx:
-    # container_name: nginx
-    # build: ./requirements/nginx/.
-    # restart: unless-stopped
-    # ports:
-    #   - 80:80
-    # volumes:
-    #   - ./requirements/nginx/conf/html/:/var/www/html/
-    #   # - ./requirements/nginx/conf/html/:/var/www/html/
-    #   # - shared:/etc/nginx/html
-    # networks:
-    #   - inception
-    # env_file:
-    #   - .env
-    # # depends_on:
-    #   # - mariadb
-    #   # - wordpress
+  nginx:
+    container_name: nginx
+    build:
+      labels:
+        - inception-nginx:latest
+      context: ./requirements/nginx/.
+    restart: unless-stopped
+    ports:
+      - ${NGINX_PORT}:443
+    volumes:
+      - shared:/var/www/html/
+    networks:
+      - ${DOCKER_NETWORK}
+    env_file:
+      - .env
+    depends_on:
+      wordpress:
+        condition: service_healthy
 
-  # wordpress:
-  #   container_name: WordPress+PHP
-  #   build: ./requirements/wordpress/.
-  #   restart: unless-stopped
-  #   ports:
-  #     - 9000:9000
-  #   volumes:
-  #     - shared:/var/www/html
-  #   networks:
-  #     - inception
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - mariadb
+  wordpress:
+    container_name: wordpress-php
+    build:
+      labels:
+        - inception-wordpress=latest
+      context: ./requirements/wordpress/.
+    restart: unless-stopped
+    ports:
+      - ${WORDPRESS_PORT}:9000
+    volumes:
+      - shared:/var/www/html/
+    healthcheck:
+      test: [ "CMD", "wp", "healthcheck", "server", "--allow-root" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 2s
+    networks:
+      - ${DOCKER_NETWORK}
+    env_file:
+      - .env
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
   mariadb:
     container_name: mariadb
@@ -38,39 +49,28 @@ services:
       labels:
         - inception-mariadb:latest
       context: ./requirements/mariadb/.
-    restart: no # change to unless-stopped
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 2s
     ports:
-      - 3306:3306
+      - ${MYSQL_PORT}:3306
     volumes:
       - database:/var/lib/mysql
-      - /Users/dibba/42/42cursus/42_inception/srcs/requirements/mariadb/tools/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
-      - inception
+      - ${DOCKER_NETWORK}
     env_file:
       - .env
 
-# bonus services
-  # redis:
-  #   container_name: redis
-  #   profiles: [bonus] # docker-compose --profile bonus up
-  #   build: ./requirements/bonus/redis/.
-  #   restart: unless-stopped
-  #   ports:
-  #     - 6379:6379
-  #   volumes:
-  #     - shared:/etc/nginx/html
-  #   networks:
-  #     - inception
-  #   env_file:
-  #     - .env
-
 volumes:
-#   shared:
-#     name: WordPress
+  shared:
+    name: ${DOCKER_SHARED_VOLUME}
   database:
-    name: DB
-    driver: local
+    name: ${DOCKER_DB_VOLUME}
 
 networks:
   inception:
-    name: inception
+    name: ${DOCKER_NETWORK}
