@@ -28,12 +28,12 @@ down:
 	@docker volume rm ${DOCKER_DB_VOLUME} ${DOCKER_SHARED_VOLUME} --force
 
 start:
-	@echo "Creating volume directories if they don't exist"
-	@mkdir -p $(PWD)/srcs/volumes/db $(PWD)/srcs/volumes/shared
 	@echo "Starting all containers"
 	@docker-compose -f $(DC_FILE) up -d
 
 build:
+	@echo "Creating volume directories if they don't exist"
+	@mkdir -p $(PWD)/srcs/volumes/db $(PWD)/srcs/volumes/shared
 	@echo "Building all containers"
 	@docker-compose -f $(DC_FILE) build
 
