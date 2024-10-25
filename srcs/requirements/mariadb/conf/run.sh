@@ -60,7 +60,7 @@ FLUSH PRIVILEGES;
 
 EOF
 
-        cat $tfile # TODO
+        cat $tfile # TODO for debug
 
         mysqld --user=mysql --bootstrap --verbose=0 --skip-name-resolve --silent-startup --skip-networking=0 < $tfile #2>&1 &
         rm -f $tfile

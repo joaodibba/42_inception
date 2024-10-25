@@ -25,16 +25,16 @@ services:
         - inception-wordpress=latest
       context: ./requirements/wordpress/.
     restart: unless-stopped
-    ports:
-      - ${WORDPRESS_PORT}:9000
+    # ports:
+      # - ${WORDPRESS_PORT}:9000
     volumes:
       - shared:/var/www/html/
     healthcheck:
       test: [ "CMD", "wp", "healthcheck", "server", "--allow-root" ]
       interval: 2s
       timeout: 5s
-      retries: 5
-      start_period: 2s
+      retries: 10
+      start_period: 5s
     networks:
       - ${DOCKER_NETWORK}
     env_file:
@@ -51,13 +51,13 @@ services:
       context: ./requirements/mariadb/.
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      test: [ "CMD", "mysqladmin", "ping", "-u", "$MYSQL_USER", "-p$MYSQL_USER", "--silent" ]
       interval: 2s
       timeout: 5s
       retries: 5
       start_period: 2s
-    ports:
-      - ${MYSQL_PORT}:3306
+    # ports:
+      # - ${MYSQL_PORT}:3306
     volumes:
       - database:/var/lib/mysql
     networks:
@@ -68,9 +68,18 @@ services:
 volumes:
   shared:
     name: ${DOCKER_SHARED_VOLUME}
+    driver_opts:
+      type: none
+      device: ${DOCKER_SHARED_VOLUME_PATH}
+      o: bind
   database:
     name: ${DOCKER_DB_VOLUME}
+    driver_opts:
+      type: none
+      device: ${DOCKER_DB_VOLUME_PATH}
+      o: bind
 
 networks:
   inception:
     name: ${DOCKER_NETWORK}
+    driver: bridge

@@ -53,12 +53,10 @@ RUN	apk update && apk upgrade && apk add --no-cache \
 		php7-zlib
 
 
-# php config
 RUN	adduser -S nginx &&	addgroup -S nginx
 COPY conf/php-fpm.conf /etc/php7/php-fpm.conf
 COPY conf/www.conf /etc/php7/php-fpm.d/www.conf
 
-# install wordpress
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar
 RUN cp wp-cli.phar /usr/bin/wp
@@ -67,5 +65,7 @@ COPY conf/html/index.html /var/www/html/index.html
 COPY tools/run.sh /tmp/run.sh
 
 WORKDIR /var/www/html/wordpress
+
+EXPOSE 9000
 
 ENTRYPOINT [ "sh", "/tmp/run.sh" ]

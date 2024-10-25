@@ -19,4 +19,6 @@ COPY ./tools/docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 COPY ./tools/pre-exec.d /scripts/pre-exec.d
 COPY ./tools/pre-init.d /scripts/pre-init.d
 
+EXPOSE 3306
+
 ENTRYPOINT ["/scripts/run.sh"]

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+env | sort
+
 function with_backoff {
   local max_attempts=${ATTEMPTS-5}
   local timeout=${TIMEOUT-1}
@@ -30,7 +32,7 @@ function with_backoff {
   return $exitCode
 }
 
-with_backoff mariadb -h$WORDPRESS_DB_HOST -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD $WORDPRESS_DB_NAME &>/dev/null;
+with_backoff mariadb -h mariadb -u$WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD $WORDPRESS_DB_NAME &>/dev/null;
 
 if [ ! -f "/opt/setup_done" ]; then
 
@@ -42,7 +44,7 @@ if [ ! -f "/opt/setup_done" ]; then
         --dbname=$WORDPRESS_DB_NAME \
         --dbuser=$WORDPRESS_DB_USER \
         --dbpass=$WORDPRESS_DB_PASSWORD \
-        --dbhost=$WORDPRESS_DB_HOST:$WORDPRESS_DB_PORT \
+        --dbhost=mariadb\
         --dbcharset=$WORDPRESS_DB_CHARSET \
         --dbcollate=$WORDPRESS_DB_COLLATION \
         --allow-root
