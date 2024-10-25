@@ -66,6 +66,4 @@ COPY tools/run.sh /tmp/run.sh
 
 WORKDIR /var/www/html/wordpress
 
-EXPOSE 9000
-
 ENTRYPOINT [ "sh", "/tmp/run.sh" ]
