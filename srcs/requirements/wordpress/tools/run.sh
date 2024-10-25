@@ -44,7 +44,7 @@ if [ ! -f "/opt/setup_done" ]; then
         --dbname=$WORDPRESS_DB_NAME \
         --dbuser=$WORDPRESS_DB_USER \
         --dbpass=$WORDPRESS_DB_PASSWORD \
-        --dbhost=mariadb\
+        --dbhost=mariadb \
         --dbcharset=$WORDPRESS_DB_CHARSET \
         --dbcollate=$WORDPRESS_DB_COLLATION \
         --allow-root
