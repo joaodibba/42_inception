@@ -3,7 +3,7 @@ services:
     container_name: nginx
     build:
       labels:
-        - inception-nginx:latest
+        - nginx
       context: ./requirements/nginx/.
     restart: unless-stopped
     ports:
@@ -19,10 +19,10 @@ services:
         condition: service_healthy
 
   wordpress:
-    container_name: wordpress-php
+    container_name: wordpress
     build:
       labels:
-        - inception-wordpress=latest
+        - wordpress
       context: ./requirements/wordpress/.
     restart: unless-stopped
     volumes:
@@ -45,7 +45,7 @@ services:
     container_name: mariadb
     build:
       labels:
-        - inception-mariadb:latest
+        - mariadb
       context: ./requirements/mariadb/.
     restart: unless-stopped
     healthcheck:
