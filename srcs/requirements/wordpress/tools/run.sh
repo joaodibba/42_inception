@@ -46,6 +46,7 @@ if [ ! -f "/opt/setup_done" ]; then
         --dbcharset=$WORDPRESS_DB_CHARSET \
         --dbcollate=$WORDPRESS_DB_COLLATION \
         --allow-root
+
     echo "Installing WordPress"
     wp core install \
         --url=$DOMAIN_NAME/wordpress \
@@ -53,7 +54,6 @@ if [ ! -f "/opt/setup_done" ]; then
         --admin_user=$WORDPRESS_ADMIN \
         --admin_email=$WORDPRESS_ADMIN_EMAIL \
         --admin_password=$WORDPRESS_ADMIN_PASSWORD \
-        --skip-email \
         --allow-root
 
     echo "Creating user $WORDPRESS_USER"
