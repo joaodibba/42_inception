@@ -49,7 +49,7 @@ services:
       context: ./requirements/mariadb/.
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-u", "$MYSQL_USER", "-p$MYSQL_USER", "--silent" ]
+      test: [ "CMD", "mysqladmin", "ping", "-u", "$MYSQL_USER", "-p", "$MYSQL_PASSWORD", "--silent" ]
       interval: 2s
       timeout: 5s
       retries: 5
